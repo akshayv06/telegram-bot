@@ -1,0 +1,22 @@
+// bruno.bru
+const axios = require("axios");
+
+const testChatId = "123456789"; // fake chatId
+
+const sendCommand = async (cmd) => {
+  try {
+    const res = await axios.post("http://localhost:3000/api/telegram", {
+      message: { chat: { id: testChatId }, text: cmd },
+    });
+    console.log(`Sent "${cmd}" - status: ${res.status}`);
+  } catch (err) {
+    console.error(`Failed "${cmd}" -`, err.response?.data || err.message);
+  }
+};
+
+(async () => {
+  await sendCommand("ENABLE");
+  await sendCommand("FREQUENCY 2");
+  await sendCommand("DISABLE");
+  await sendCommand("INVALID");
+})();

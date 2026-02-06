@@ -1,0 +1,77 @@
+// bruno-telegram-multi.bru - test Telegram bot with multiple users
+
+meta { 
+  name: Telegram Bot Multi-User Test
+  type: http
+  seq: 1
+}
+
+// Base URL and user IDs
+vars:pre-request {
+  baseUrl: http://localhost:3000
+  testUsers: [
+    { chatId: "111111111", name: "User1" },
+    { chatId: "222222222", name: "User2" },
+    { chatId: "333333333", name: "User3" }
+  ]
+}
+
+// Enable joke delivery for all users
+for user in testUsers {
+  post {
+    url: {{baseUrl}}/api/telegram
+    body: {
+      "message": {
+        "chat": { "id": "{{user.chatId}}" },
+        "text": "ENABLE"
+      }
+    }
+    headers {
+      Content-Type: application/json
+    }
+  }
+}
+
+// Set different frequencies
+for user, idx in testUsers {
+  post {
+    url: {{baseUrl}}/api/telegram
+    body: {
+      "message": {
+        "chat": { "id": "{{user.chatId}}" },
+        "text": "FREQUENCY {{idx + 1}}"
+      }
+    }
+    headers {
+      Content-Type: application/json
+    }
+  }
+}
+
+// Send DISABLE command to second user
+post {
+  url: {{baseUrl}}/api/telegram
+  body: {
+    "message": {
+      "chat": { "id": "{{testUsers[1].chatId}}" },
+      "text": "DISABLE"
+    }
+  }
+  headers {
+    Content-Type: application/json
+  }
+}
+
+// Send INVALID command to third user
+post {
+  url: {{baseUrl}}/api/telegram
+  body: {
+    "message": {
+      "chat": { "id": "{{testUsers[2].chatId}}" },
+      "text": "INVALID"
+    }
+  }
+  headers {
+    Content-Type: application/json
+  }
+}
